@@ -7,6 +7,21 @@ services:
       - ./data:/data
       - ./banner_data_initializer/banner_data_processor.py:/app/banner_data_processor.py
 
+  mysql:
+    platform: linux/x86_64  # added so it works on Apple M1 - you can remove this otherwise.
+    container_name: "mysql"
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: "banner"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "root_password"
+    ports:
+      - "3306:3306"
+    volumes:
+      - my-db:/var/lib/mysql
+
   banner_web_app:
     container_name: "banner_web_app"
     build: banner_web_app/.
@@ -14,3 +29,6 @@ services:
       - ./banner_web_app/.:/app
     ports:
       - "8000:8000"
+
+volumes:
+  my-db:
