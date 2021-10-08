@@ -1,6 +1,5 @@
-import redis, random, datetime, math
+import redis, random, datetime, math, mysql.connector
 from flask import Flask, render_template, request, url_for, redirect
-import mysql.connector
 
 
 db_connection = mysql.connector.connect(host="mysql", user="user", password="password", database="banner")
@@ -39,14 +38,30 @@ def show_campaign_banners(campaign_id):
     return render_template('banners.html', banners=banners)
 
 
+def get_data_from_redis(campaign_id, hour_quarter):
+    redis_key = str(hour_quarter) + "_" + str(campaign_id)
+    return redis.get(redis_key)
+
+
+def set_data_in_redis(campaign_id, hour_quarter, data):
+    redis_key = str(hour_quarter) + "_" + str(campaign_id)
+    redis.set(redis_key, bytes(str(data), 'utf-8'))
+
+
 def get_campaign_data(campaign_id):
     now = datetime.datetime.now()
     hour_quarter = math.floor(now.minute / 15) + 1
+    data = get_data_from_redis(campaign_id, hour_quarter)
+    if data is not None:
+        return list(eval(data.decode('utf-8')))
+
     table = "q" + str(hour_quarter) + "_campaign_banners"
     sql = "SELECT `X`, `banner_id`, `total_revenue`, `total_clicks`, `order` FROM " + table + " where campaign_id = " \
           + campaign_id + " order by total_revenue desc, total_clicks desc"
     db_cursor.execute(sql)
-    return db_cursor.fetchall()
+    data = db_cursor.fetchall()
+    set_data_in_redis(campaign_id, hour_quarter, data)
+    return data
 
 
 def get_banners_for_high_conversion_campaigns(data):
@@ -59,7 +74,7 @@ def get_banners_for_high_conversion_campaigns(data):
     return banners
 
 
-def get_banners_for_low_conversion_campaigns(data):
+def get_banners_for_low_conversion_campaigns(data, X):
     banners = []
     idx = 0
     max_banners_to_show = 5
@@ -134,23 +149,10 @@ def compute_banners_to_show(data):
     # that is < 5, then we don't do anything else. I will leave some code commented which would fill up the banner count
     # to 5 by including random banners from within that campaign
     elif X > 0:
-        banners = get_banners_for_low_conversion_campaigns(data)
+        banners = get_banners_for_low_conversion_campaigns(data, X)
 
     else:  # X == 0
         banners = get_banners_for_no_conversion_campaigns(data)
 
     random.shuffle(banners)
     return banners
-
-# @app.route('/visitor')
-# def visitor():
-#     redis.incr('visitor')
-#     visitor_num = redis.get('visitor').decode("utf-8")
-#     return "Visitor: %s" % visitor_num
-#
-#
-# @app.route('/visitor/reset')
-# def reset_visitor():
-#     redis.set('visitor', 0)
-#     visitor_num = redis.get('visitor').decode("utf-8")
-#     return "Visitor is reset to %s" % visitor_num

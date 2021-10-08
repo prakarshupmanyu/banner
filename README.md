@@ -51,8 +51,12 @@ As you can see both these components connect to MySql, so it is important that M
 to connect with it. I have added sufficient sleep time in both those components to fulfill that requirement. You can 
 change that if you want and that would require you to build again for your change to take effect.
 
-I have also included a `stress_test.py` script to compute the time taken to run 5000 requests. This script needs to be 
+I have included a `stress_test.py` script to compute the time taken to run 5000 requests. This script needs to be 
 run manually.
+
+I have also added `Redis` as a cache store for the web_app to serve the banners quickly. It's a cache store to the MySql 
+backend database. During my tests, I finished 5000 requests in 18-19 seconds without `Redis` and ran the same set of 
+requests in 6-7 seconds with `Redis`. That is a huge improvement of more than 65% in response time.
 
 ### Steps to run the app
 
