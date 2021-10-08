@@ -1,4 +1,4 @@
-import redis, random
+import redis, random, datetime, math
 from flask import Flask, render_template, request, url_for, redirect
 import mysql.connector
 
@@ -28,7 +28,9 @@ def get_specific_campaign(campaign_id):
         return render_template('home.html', error=error)
 
     # generate and execute the SQL according to time
-    table = "q1_campaign_banners"
+    now = datetime.datetime.now()
+    hour_quarter = math.floor(now.minute/15) + 1
+    table = "q" + str(hour_quarter) + "_campaign_banners"
     sql = "SELECT `X`, `banner_id`, `total_revenue`, `total_clicks`, `order` FROM " + table + " where campaign_id = " \
           + campaign_id + " order by total_revenue desc, total_clicks desc"
     db_cursor.execute(sql)
