@@ -1,5 +1,12 @@
 version: '3'
 services:
+  banner_data_initializer:
+    container_name: 'banner_data_initializer'
+    build: banner_data_initializer/.
+    volumes:
+      - ./data:/data
+      - ./banner_data_initializer/banner_data_processor.py:/app/banner_data_processor.py
+
   banner_web_app:
     container_name: "banner_web_app"
     build: banner_web_app/.
