@@ -16,6 +16,7 @@ for i in range(1, 5):
     conversions_df.registerTempTable("conversions")
     impressions_df.registerTempTable("impressions")
 
+    # Computing the X value
     campaign_banners_with_conversion_df = \
         spark.sql("select count(distinct banner_id) as X, campaign_id "
                   "from clicks cl inner join conversions co "
@@ -23,6 +24,7 @@ for i in range(1, 5):
                   "where co.revenue > 0.0 "
                   "group by cl.campaign_id")
 
+    # computing banners for each campaign whether converted or not
     banner_performance_df = spark.sql("select i.campaign_id, i.banner_id, total_revenue, total_clicks "
                                       "from impressions i left join ("
                                       "select campaign_id, banner_id, "
@@ -34,9 +36,11 @@ for i in range(1, 5):
                                       "group by i.campaign_id, i.banner_id, total_revenue, total_clicks")\
         .fillna(0, subset=['total_revenue', 'total_clicks'])
 
+    # We never need more than 10 banners to show for a campaign. Sorted based on revenue and then clicks
     w = Window.partitionBy(banner_performance_df.campaign_id).orderBy(desc("total_revenue"), desc("total_clicks"))
-
     ordered_banner_df = banner_performance_df.withColumn("order", f.row_number().over(w)).filter("order <= 10")
+
+    # add the X value to the data, left join so as to include campaigns with no conversions
     final_df = ordered_banner_df.join(campaign_banners_with_conversion_df,
                                       ordered_banner_df.campaign_id == campaign_banners_with_conversion_df.campaign_id,
                                       "left")\
