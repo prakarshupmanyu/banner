@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Banners</title>
+</head>
+<body>
+<h1>Let's see some banners</h1>
+<form action="/campaigns" method="post">
+    <label>Enter Campaign ID</label>
+    <input type="text" name="campaign_id" value="" required>
+    <input type="submit" value="Submit">
+</form>
+<p style="color:red">{{ error }}</p>
+
+</body>
+</html>
