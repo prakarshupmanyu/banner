@@ -52,7 +52,7 @@ to connect with it. I have added sufficient sleep time in both those components 
 change that if you want and that would require you to build again for your change to take effect.
 
 I have included a `stress_test.py` script to compute the time taken to run 5000 requests. This script needs to be 
-run manually.
+run manually. See steps below for that.
 
 I have also added `Redis` as a cache store for the web_app to serve the banners quickly. It's a cache store to the MySql 
 backend database. During my tests, I finished 5000 requests in 18-19 seconds without `Redis` and ran the same set of 
@@ -72,3 +72,16 @@ and stored the output in MySql for the web_app, so you could skip it by running
 You are able to do this because I have added the proper changes 
 so that the MySql database persists after the first computation. Even if you delete the images and rebuild the containers. 
 This is done through docker volumes.
+
+### Steps to run the stress test
+
+* Start the web app - `docker-compose up`. Ensure that the banner_web_app is running before proceeding.
+* Open a separate terminal and run `docker ps`
+* In the output, copy the `CONTAINER ID` for the `banner_web_app`
+```buildoutcfg
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS         PORTS                                                  NAMES
+7f50c803502e   banners_banner_web_app   "/bin/sh -c 'sleep 6…"   2 minutes ago   Up 2 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp              banner_web_app
+```
+* Login to the RUNNING web app container - `docker exec -it <container_id> sh`
+* You should be logged in to the `/app` directory. In any case, run the `stress_test.py` script using `python stress_test.py`.
+* Wait for the results.
