@@ -43,11 +43,11 @@ for i in range(1, 5):
         .drop(campaign_banners_with_conversion_df.campaign_id)\
         .fillna(0, subset=['X'])
 
-    num_banner_table = "q" + str(i) + "_campaign_banners"
+    campaign_banner_table = "q" + str(i) + "_campaign_banners"
     final_df.write.format('jdbc').options(
         url='jdbc:mysql://mysql:3306/banner',
         driver='com.mysql.cj.jdbc.Driver',
-        dbtable=num_banner_table,
+        dbtable=campaign_banner_table,
         user='user',
         password='password').mode('overwrite').save()
 

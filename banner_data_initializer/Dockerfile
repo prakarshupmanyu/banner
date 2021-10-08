@@ -22,5 +22,5 @@ COPY lib/mysql-connector-java-8.0.26.jar /opt/spark/jars/
 
 ENV SPARK_HOME="/opt/spark"
 
-CMD sleep 10 \
+CMD sleep 15 \
 && /opt/spark/bin/spark-submit /app/banner_data_processor.py
