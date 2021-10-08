@@ -6,6 +6,8 @@ services:
     volumes:
       - ./data:/data
       - ./banner_data_initializer/banner_data_processor.py:/app/banner_data_processor.py
+    depends_on:
+      - mysql
 
   mysql:
     platform: linux/x86_64  # added so it works on Apple M1 - you can remove this otherwise.
