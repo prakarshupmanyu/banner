@@ -1,4 +1,9 @@
 from flask import Flask, render_template, request, url_for, redirect
+import mysql.connector
+
+
+db_connection = mysql.connector.connect(host="mysql", user="user", password="password", database="banner")
+db_cursor = db_connection.cursor()
 
 app = Flask(__name__)
 
@@ -19,4 +24,11 @@ def get_specific_campaign(campaign_id):
         error = "Campaign ID is supposed to be a single positive integer value. Please enter again."
         return render_template('home.html', error=error)
 
-    return campaign_id
+    table = "q1_campaign_banners"
+    sql = "SELECT X FROM " + table + " where campaign_id = " + campaign_id
+    print(sql)
+    db_cursor.execute(sql)
+    result = db_cursor.fetchall()
+    num_converted_banners = result[0][0]
+
+    return str(result[0][0])
