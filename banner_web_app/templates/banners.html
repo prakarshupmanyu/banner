@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Campaign Banners</title>
+</head>
+<body>
+<h1>Here are your banners</h1>
+{% for banner in banners %}
+    <div><img src="/static/images/image_{{ banner }}.png"></div>
+{% endfor %}
+
+</body>
+</html>

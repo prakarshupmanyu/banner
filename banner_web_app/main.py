@@ -103,13 +103,13 @@ def get_specific_campaign(campaign_id):
 
         # Fill up random banners
         while num_banners_to_add > 0:
-            banner = str(random.randint(1, 500))
+            banner = str(random.randint(100, 500))
             if banner not in banners:
                 banners.append(banner)
                 num_banners_to_add -= 1
 
     random.shuffle(banners)
-    return str(banners)
+    return render_template('banners.html', banners=banners)
 
 
 # @app.route('/visitor')
